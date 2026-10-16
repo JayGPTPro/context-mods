@@ -1,0 +1,10 @@
+{
+  "name": "hebrew-tools",
+  "version": "1.0.0",
+  "description": "Buttons above the prompt for Hebrew readers: translate the last English reply into Hebrew and back, and flip Hebrew lines between right and left alignment",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "JayGPTPro",
+    "url": "https://jaygptpro.com"
+  }
+}

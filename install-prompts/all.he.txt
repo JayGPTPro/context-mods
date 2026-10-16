@@ -1,0 +1,9 @@
+תתקין לי את המודים של ג'יי ל-Claude Code: TL;DR, Copy chat ו-Smart PreCompact. בבקשה:
+1. תבדוק שיש Node.js: npx --version. אם אין, תגיד לי להתקין Node.js מ-nodejs.org ותעצור כאן.
+2. תריץ: npx -y skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat -g -a claude-code -y
+3. תריץ: npx -y skills add JayGPTPro/smart-precompact -g -a claude-code -y. אם ~/.claude/skills/smart-precompact כבר קיים, זה עדכון: קודם תשמור את config.md שלו מחוץ ל-~/.claude/skills, ותחזיר אותו אחרי.
+4. תבדוק שכל אחד מאלה קיים: ~/.claude/skills/tldr-highlight/.claude-plugin/plugin.json, ~/.claude/skills/copy-chat/.claude-plugin/plugin.json ו-~/.claude/skills/smart-precompact/.claude-plugin/plugin.json (בווינדוס, תחת %USERPROFILE%\.claude\skills). אם יש בתוך ~/.claude/skills עוד עותק או גיבוי של אחת התיקיות האלה, תגיד לי ותשאל לפני שאתה מוחק: Claude Code יטען מוד פעמיים.
+5. תבדוק שיש Python 3 (python3 --version, ואם לא עובד python --version). בלעדיו Copy chat מעתיק בלי השעות, וה-hook האופציונלי של Smart PreCompact צריך אותו.
+6. ל-Smart PreCompact יש hook אופציונלי. תקרא את הסעיף "The hook" ב-~/.claude/skills/smart-precompact/README.he.md (או README.md), תסביר לי אותו בשתי שורות, ותשאל אם להתקין. אם אני מאשר ויש Python 3: תריץ איתו את ~/.claude/skills/smart-precompact/scripts/install_hook.py, ואחר כך scripts/compact_hook.py --test.
+7. תשאל אותי בשורה אחת אם להוסיף גם את Hebrew tools (תרגום של תשובה באנגלית לעברית, ויישור עברית לימין). אם כן: npx -y skills add JayGPTPro/context-mods --skill hebrew-tools -g -a claude-code -y
+8. תגיד לי בדיוק את זה: "תפתח שיחה חדשה ב-Claude Code. באפליקציה, מעל שורת הכתיבה תהיה שורה אחת: TL;DR, Copy chat, ומהתשובה הראשונה מד הקונטקסט של Smart PreCompact עם הכפתור Smart compact. אחרי תשובה ארוכה, הפסקאות ששווה לקרוא נצבעות בצהוב והודעה אומרת את התשובה במשפט אחד. בשיחה הזו לא ישתנה כלום, כי מודים נטענים רק בשיחה חדשה. אין שורה? גרסת ה-Claude Code שלך עוד לא מריצה מודים: תעדכן את Claude Code ותפתח שוב שיחה חדשה."

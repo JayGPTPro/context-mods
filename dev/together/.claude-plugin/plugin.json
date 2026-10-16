@@ -1,0 +1,8 @@
+{
+  "name": "together",
+  "version": "0.0.0",
+  "description": "Development only: loads the collection's mods side by side to test the shared row in every order",
+  "author": {
+    "name": "JayGPTPro"
+  }
+}
