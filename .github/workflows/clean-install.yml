@@ -1,0 +1,66 @@
+# A fresh Mac, Windows and Linux machine installs each mod the way the install prompts do
+# (npx skills add from this repo), alone and all together, and checks what lands.
+name: Clean install
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        mods: ["tldr-highlight", "copy-chat", "hebrew-tools", "all"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the way the prompt does
+        run: |
+          if [ "${{ matrix.mods }}" = "all" ]; then
+            npx -y skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat -g -a claude-code -y
+            npx -y skills add JayGPTPro/smart-precompact -g -a claude-code -y
+          else
+            npx -y skills add JayGPTPro/context-mods --skill "${{ matrix.mods }}" -g -a claude-code -y
+          fi
+
+      - name: Check what landed
+        run: |
+          if [ "${{ matrix.mods }}" = "all" ]; then want="tldr-highlight copy-chat smart-precompact"; else want="${{ matrix.mods }}"; fi
+          base="$HOME/.claude/skills"
+          ls -la "$base"
+          for m in $want; do
+            f="$base/$m/.claude-plugin/plugin.json"
+            test -f "$f" || { echo "MISSING $f"; exit 1; }
+            python -c "import json,sys; d=json.load(open(sys.argv[1])); print(sys.argv[2], '->', d['name'], d.get('version'))" "$f" "$m"
+            test -f "$base/$m/hooks/hooks.json" || { echo "MISSING hooks.json in $m"; exit 1; }
+          done
+          # nothing but the asked-for mods: a stray copy would load a mod twice
+          extra=$(ls "$base" | grep -v -x -E "$(echo $want | tr ' ' '|')" || true)
+          if [ -n "$extra" ]; then echo "UNEXPECTED in skills: $extra"; exit 1; fi
+
+      - name: Copy chat's transcript reader
+        if: matrix.mods == 'copy-chat' || matrix.mods == 'all'
+        run: python skills/copy-chat/tests/test_thread.py
+
+      - name: Smart PreCompact's hook tests
+        if: matrix.mods == 'all'
+        run: python "$HOME/.claude/skills/smart-precompact/scripts/test_compact_hook.py"
+
+      - name: Validate with Claude Code
+        continue-on-error: true
+        run: |
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+          for d in "$HOME"/.claude/skills/*/; do echo "== $d"; claude plugin validate "$d" 2>&1 | tail -2; done
