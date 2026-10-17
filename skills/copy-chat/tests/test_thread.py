@@ -1,5 +1,6 @@
 """thread.py on a small transcript holding every kind of row it meets. Run: python3 tests/test_thread.py"""
 import json
+import re
 import os
 import subprocess
 import sys
@@ -83,6 +84,15 @@ def copy_checks(home):
     assert there.stdout.split('\n', 1)[1].rstrip('\n') == 'Noa (Oct 8 12:00): moved', there.stdout
 
 
+
+def same(got, want):
+    """Equal text. On Windows, Python ignores the TZ the test sets, so times come out in the machine's own
+    zone (what a real user wants): there everything but the clock is compared."""
+    if not sys.platform.startswith('win'):
+        return got == want
+    clock = re.compile(r'\((?:[A-Z][a-z]{2} \d{1,2} )?\d{2}:\d{2}\)|, \d{2}:\d{2}\]')
+    return clock.sub('(T)', got) == clock.sub('(T)', want)
+
 def main():
     home = tempfile.mkdtemp()
     project = os.path.join(home, '.claude', 'projects', '-p')
@@ -94,13 +104,13 @@ def main():
     # No account file: "Me".
     receipt, body = run(home, 'sess-1', '/p', '--print')
     assert receipt == {'ok': True, 'mine': 3, 'claude': 3, 'compacts': 1}, receipt
-    assert body == expected('Me'), f'\n--- got ---\n{body}\n--- expected ---\n{expected("Me")}'
+    assert same(body, expected('Me')), f'\n--- got ---\n{body}\n--- expected ---\n{expected("Me")}'
 
     # The first word of the account's name.
     with open(os.path.join(home, '.claude.json'), 'w', encoding='utf-8') as handle:
         json.dump({'oauthAccount': {'displayName': 'Dana Levi', 'emailAddress': 'x@example.com'}}, handle)
     _, body = run(home, 'sess-1', '/p', '--print')
-    assert body == expected('Dana'), body
+    assert same(body, expected('Dana')), body
 
     # --latest: the newest conversation of the folder.
     time.sleep(0.05)
@@ -108,10 +118,10 @@ def main():
         handle.write(json.dumps({'type': 'user', 'timestamp': '2026-10-08T09:00:00Z', 'message': {'content': 'newest'}}) + '\n')
     receipt, body = run(home, '--latest', '/p', '--print')
     assert receipt == {'ok': True, 'mine': 1, 'claude': 0, 'compacts': 0}, receipt
-    assert body == 'Dana (Oct 8 12:00): newest', body
+    assert same(body, 'Dana (Oct 8 12:00): newest'), body
 
     receipt, body = run(home, '${CLAUDE_SESSION_ID}', '/p', '--print')
-    assert body == 'Dana (Oct 8 12:00): newest', body
+    assert same(body, 'Dana (Oct 8 12:00): newest'), body
 
     copy_checks(home)
 
