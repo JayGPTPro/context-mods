@@ -38,7 +38,8 @@ def expected(me):
 
 
 def run(home, *args):
-    env = {**os.environ, 'HOME': home, 'TZ': 'Asia/Jerusalem'}
+    # USERPROFILE too: Python on Windows finds ~ there and ignores HOME.
+    env = {**os.environ, 'HOME': home, 'USERPROFILE': home, 'TZ': 'Asia/Jerusalem'}
     env.pop('CLAUDE_CONFIG_DIR', None)
     out = subprocess.run([sys.executable, SCRIPT, *args], capture_output=True, text=True, encoding='utf-8', env=env)
     receipt, _, body = out.stdout.partition('\n')
