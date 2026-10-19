@@ -1,5 +1,0 @@
-תתקין לי את המוד Hebrew tools ל-Claude Code, מהריפו בגיטהאב JayGPTPro/context-mods. בבקשה:
-1. תבדוק שיש Node.js: npx --version. אם אין, תוריד במקום זה את https://github.com/JayGPTPro/context-mods/archive/refs/heads/main.zip, תפתח אותו, ותעתיק את התיקייה skills/hebrew-tools (כולל התיקייה הנסתרת .claude-plugin) לתיקיית הסקילים הגלובלית שלי: ~/.claude/skills/hebrew-tools במק ובלינוקס, %USERPROFILE%\.claude\skills\hebrew-tools בווינדוס. ואז תדלג לשלב 3.
-2. תריץ: npx -y skills add JayGPTPro/context-mods --skill hebrew-tools -g -a claude-code -y
-3. תבדוק שהקובץ ~/.claude/skills/hebrew-tools/.claude-plugin/plugin.json קיים. אם יש בתוך ~/.claude/skills עוד עותק או גיבוי של התיקייה הזו, תגיד לי ותשאל לפני שאתה מוחק: Claude Code יטען את המוד פעמיים.
-4. תמחק כל הורדה או zip שיצרת בדרך, ותגיד לי בדיוק את זה: "תפתח שיחה חדשה ב-Claude Code. תראה כפתורים מעל שורת הכתיבה: Translate to Hebrew כשבתשובה יש אנגלית, ו-⇄ Left / ⇄ Right להפוך את יישור העברית. בשיחה הזו לא ישתנה כלום, כי מודים נטענים רק בשיחה חדשה. אין כפתור? גרסת ה-Claude Code שלך עוד לא מריצה מודים: תעדכן את Claude Code ותפתח שוב שיחה חדשה. להסרה בעתיד: npx skills remove hebrew-tools -g"

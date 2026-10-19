@@ -213,7 +213,7 @@ export const register: Register = on => {
     for (const part of parts) flags.push(await read($, atom({ ...MARKED, id: keyOf(part) }, false)))
     if (!flags.some(Boolean)) return next(e)
 
-    // The drawing beneath first: a mod there (hebrew-tools' translation) may draw the reply in other
+    // The drawing beneath first: a mod there (a translation, say) may draw the reply in other
     // words, and then that drawing wins and nothing is highlighted.
     const whole = await next(e)
     const firstMarked = parts[flags.indexOf(true)] ?? ''

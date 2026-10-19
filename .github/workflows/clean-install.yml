@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        mods: ["tldr-highlight", "copy-chat", "hebrew-tools", "all"]
+        mods: ["tldr-highlight", "copy-chat", "all"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:

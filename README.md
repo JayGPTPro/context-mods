@@ -14,7 +14,6 @@ installs it and Claude Code loads it by itself in every new conversation.
 | **TL;DR** (`tldr-highlight`) | After a long reply, the paragraphs worth reading turn yellow and a notification says the reply in one sentence, in your language. A `TL;DR` button turns it on and off. | One short Haiku call per long reply, from your Claude plan |
 | **Copy chat** (`copy-chat`) | A `Copy chat` button: the whole conversation on your clipboard as clean text, `Name (12:01): ...`, ready to paste into another chat or a doc. | Nothing |
 | **Smart PreCompact** | A context meter above the prompt and a `Smart compact` button that tells the compact what to keep. Lives in its own repo: [JayGPTPro/smart-precompact](https://github.com/JayGPTPro/smart-precompact). | One call when you compact |
-| **Hebrew tools** (`hebrew-tools`, optional) | For Hebrew readers: `Translate to Hebrew` on a reply in English, and `⇄ Left` / `⇄ Right` to flip Hebrew alignment. | One Sonnet call per press of Translate |
 
 Installed together, they share one row above the prompt in the desktop app.
 
@@ -26,7 +25,7 @@ Open Claude Code and paste the prompt for what you want. Claude runs the install
 tells you what to expect.
 
 - Everything (TL;DR, Copy chat and Smart PreCompact): [install-prompts/all.txt](install-prompts/all.txt)
-- One mod: [tldr.txt](install-prompts/tldr.txt), [copy-chat.txt](install-prompts/copy-chat.txt), [hebrew-tools.txt](install-prompts/hebrew-tools.txt)
+- One mod: [tldr.txt](install-prompts/tldr.txt) and [copy-chat.txt](install-prompts/copy-chat.txt)
 
 Then open a new conversation. Mods load only when a conversation starts.
 
@@ -39,7 +38,7 @@ npx skills add JayGPTPro/context-mods --skill tldr-highlight -g -a claude-code
 ```
 
 ```bash
-npx skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat hebrew-tools -g -a claude-code
+npx skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat -g -a claude-code
 ```
 
 Smart PreCompact installs from its own repo:
@@ -74,13 +73,6 @@ can also ask in words ("copy this chat"), which works even where mods do not.
 It needs Python 3 for the times; without it the button copies the messages without times. On
 Linux it uses `wl-copy`, `xclip` or `xsel` when one is there.
 
-### Hebrew tools
-
-`Translate to Hebrew` shows when one of the last few replies has English text, and draws the
-Hebrew in its place; code, commands, paths and names stay as written. `↩ Original` and
-`Show Hebrew` switch back and forth. `⇄ Left` / `⇄ Right` flips the side Hebrew lines align to;
-right is the default.
-
 ### Every mod
 
 Only the drawing changes. The conversation, and what Claude reads, stay as written. Calls a mod
@@ -92,7 +84,7 @@ makes to a model go through your own Claude Code login, like the conversation it
 claude plugin disable tldr@skills-dir
 ```
 
-The names are `tldr`, `copy-chat` and `hebrew-tools`. To remove one:
+The names are `tldr` and `copy-chat`. To remove one:
 
 ```bash
 npx skills remove tldr-highlight -g
@@ -116,9 +108,9 @@ twice.
 ## For developers
 
 Each mod is a skill folder in `skills/`: `SKILL.md`, `.claude-plugin/plugin.json`, `hooks/`
-(`register.tsx`, and `panel.ts`, the shared row, the same file in all three) and `tests/`.
+(`register.tsx`, and `panel.ts`, the shared row, the same file in both) and `tests/`.
 `dev/test-all.sh` runs every check: each mod's `claude plugin test`, `claude plugin validate`,
-the Copy chat script's tests, that the three `panel.ts` copies match, and the shared row in every
+the Copy chat script's tests, that the two `panel.ts` copies match, and the shared row in every
 order the mods and Smart PreCompact can load in. It runs on Mac and Linux.
 
 Built by [Jay](https://jaygptpro.com). An independent project, not an Anthropic product.

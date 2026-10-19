@@ -4,7 +4,7 @@ import os
 import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'skills')
-MODS = ['tldr-highlight', 'copy-chat', 'hebrew-tools']
+MODS = ['tldr-highlight', 'copy-chat']
 
 digests = {}
 for mod in MODS:
@@ -13,4 +13,4 @@ for mod in MODS:
 if len(set(digests.values())) != 1:
     print('panel.ts differs between mods:', digests)
     sys.exit(1)
-print('panel.ts: the same in all three mods')
+print('panel.ts: the same in both mods')

@@ -1,4 +1,4 @@
-// One row above the prompt for every mod in this collection (tldr, copy-chat, hebrew-tools).
+// One row above the prompt for every mod in this collection (tldr, copy-chat).
 // Shared file: the three copies are kept the same (dev/check_shared.py checks).
 //
 // Hooks on the row above the prompt nest: each one gets the drawing of the hooks beneath it from

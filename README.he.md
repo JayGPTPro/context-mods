@@ -13,7 +13,6 @@
 | **TL;DR** (`tldr-highlight`) | אחרי תשובה ארוכה, הפסקאות ששווה לקרוא נצבעות בצהוב והודעה קטנה אומרת את כל התשובה במשפט אחד, בשפה שלך. כפתור `TL;DR` מדליק ומכבה. | קריאה קצרה אחת ל-Haiku לכל תשובה ארוכה, מהמנוי שלך |
 | **Copy chat** (`copy-chat`) | כפתור `Copy chat`: כל השיחה בקליפבורד כטקסט נקי, `שם (12:01): ...`, מוכנה להדבקה בצ'אט אחר או במסמך. | כלום |
 | **Smart PreCompact** | מד קונטקסט מעל שורת הכתיבה וכפתור `Smart compact` שאומר לקומפאקט מה לשמור. נמצא בריפו משלו: [JayGPTPro/smart-precompact](https://github.com/JayGPTPro/smart-precompact). | קריאה אחת כשעושים קומפאקט |
-| **Hebrew tools** (`hebrew-tools`, אופציונלי) | למי שקורא עברית: `Translate to Hebrew` על תשובה באנגלית, ו-`⇄ Left` / `⇄ Right` להפוך את יישור העברית. | קריאה אחת ל-Sonnet לכל לחיצה על תרגום |
 
 כשמתקינים כמה, הם חולקים שורה אחת מעל שורת הכתיבה באפליקציה.
 
@@ -24,7 +23,7 @@
 פותחים Claude Code ומדביקים את הפרומפט של מה שרוצים. Claude מריץ את ההתקנה, בודק אותה, ואומר מה לצפות.
 
 - הכל (TL;DR, Copy chat ו-Smart PreCompact): [install-prompts/all.he.txt](install-prompts/all.he.txt)
-- מוד אחד: [tldr.he.txt](install-prompts/tldr.he.txt), [copy-chat.he.txt](install-prompts/copy-chat.he.txt), [hebrew-tools.he.txt](install-prompts/hebrew-tools.he.txt)
+- מוד אחד: [tldr.he.txt](install-prompts/tldr.he.txt) ו-[copy-chat.he.txt](install-prompts/copy-chat.he.txt)
 
 אחר כך פותחים שיחה חדשה. מודים נטענים רק כשהשיחה מתחילה.
 
@@ -39,7 +38,7 @@ npx skills add JayGPTPro/context-mods --skill tldr-highlight -g -a claude-code
 ```
 
 ```bash
-npx skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat hebrew-tools -g -a claude-code
+npx skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat -g -a claude-code
 ```
 
 <div dir="rtl">
@@ -68,10 +67,6 @@ npx skills add JayGPTPro/smart-precompact -g -a claude-code
 
 השעות צריכות Python 3; בלעדיו הכפתור מעתיק את ההודעות בלי שעות. בלינוקס הוא משתמש ב-`wl-copy`, `xclip` או `xsel` אם יש.
 
-### Hebrew tools
-
-`Translate to Hebrew` מופיע כשבאחת התשובות האחרונות יש טקסט באנגלית, ומציג את העברית במקומו; קוד, פקודות, נתיבים ושמות נשארים כמו שהם. `↩ Original` ו-`Show Hebrew` מחליפים הלוך ושוב. `⇄ Left` / `⇄ Right` הופך את הצד שאליו שורות עברית מיושרות; ימין כברירת מחדל.
-
 ### בכל המודים
 
 רק התצוגה משתנה. השיחה עצמה, ומה ש-Claude קורא, נשארים כמו שנכתבו. קריאות למודל עוברות דרך החיבור שלך ל-Claude Code, כמו השיחה עצמה.
@@ -86,7 +81,7 @@ claude plugin disable tldr@skills-dir
 
 <div dir="rtl">
 
-השמות הם `tldr`, `copy-chat` ו-`hebrew-tools`. להסרה:
+השמות הם `tldr` ו-`copy-chat`. להסרה:
 
 </div>
 
@@ -108,7 +103,7 @@ npx skills remove tldr-highlight -g
 
 ## למפתחים
 
-כל מוד הוא תיקיית סקיל בתוך `skills/`: ‏`SKILL.md`, ‏`.claude-plugin/plugin.json`, ‏`hooks/` (`register.tsx`, ו-`panel.ts`, השורה המשותפת, אותו קובץ בשלושתם) ו-`tests/`. ‏`dev/test-all.sh` מריץ את כל הבדיקות: `claude plugin test` ו-`claude plugin validate` לכל מוד, הבדיקות של סקריפט ההעתקה, שלושת העותקים של `panel.ts` זהים, והשורה המשותפת בכל סדר טעינה אפשרי של המודים ו-Smart PreCompact.
+כל מוד הוא תיקיית סקיל בתוך `skills/`: ‏`SKILL.md`, ‏`.claude-plugin/plugin.json`, ‏`hooks/` (`register.tsx`, ו-`panel.ts`, השורה המשותפת, אותו קובץ בשניהם) ו-`tests/`. ‏`dev/test-all.sh` מריץ את כל הבדיקות: `claude plugin test` ו-`claude plugin validate` לכל מוד, הבדיקות של סקריפט ההעתקה, שני העותקים של `panel.ts` זהים, והשורה המשותפת בכל סדר טעינה אפשרי של המודים ו-Smart PreCompact.
 
 נבנה על ידי [ג'יי](https://jaygptpro.com). פרויקט עצמאי, לא מוצר של Anthropic.
 

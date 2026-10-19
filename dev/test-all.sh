@@ -1,10 +1,10 @@
 #!/bin/sh
 # Every check this collection has, in one run: each mod's own tests, the transcript script's, the
-# shared row file being the same in all three, and the three mods loaded together in every order.
+# shared row file being the same in both, and the mods loaded together in every order.
 set -e
 cd "$(dirname "$0")/.."
 python3 dev/check_shared.py
-for mod in tldr-highlight copy-chat hebrew-tools; do
+for mod in tldr-highlight copy-chat; do
   claude plugin validate "skills/$mod" > /dev/null
   claude plugin test "skills/$mod"
 done

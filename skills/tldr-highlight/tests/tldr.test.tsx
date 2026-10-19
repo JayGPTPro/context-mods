@@ -147,7 +147,7 @@ describe('highlight', () => {
     // Two highlighted boxes, each holding one picked paragraph.
     expect(tree.split(YELLOW).length - 1).toBe(2)
     expect(tree).not.toMatch(ENGINE)
-    // Each paragraph is still drawn by the hooks beneath (hebrew-tools' alignment, the engine), and
+    // Each paragraph is still drawn by the hooks beneath (another mod's alignment, the engine), and
     // only the first carries the reply's bullet.
     expect(tree).toContain('DRAWN:מחכה לך: צריך אישור')
     expect(tree).toContain('DRAWN•:## מה עשיתי')

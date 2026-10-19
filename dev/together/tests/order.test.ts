@@ -1,4 +1,4 @@
-// The three mods and Smart PreCompact chained in every order the skills folder can list them. Each
+// The mods and Smart PreCompact chained in every order the skills folder can list them. Each
 // step does what that mod's row hook does: take the drawing beneath, seat its items with `seat`, or
 // draw the shared row itself. The trees are plain data, as a hook receives them from next(e).
 // Each mod's own tests check that its real hook calls `seat` this way.
@@ -30,12 +30,6 @@ const mod = (name: string, items: (s: Surface) => Node[], lead: (s: Surface) => 
 
 const TLDR = mod('tldr', () => [button('tldr-off', '↩ No TL;DR')])
 const COPY = mod('copy-chat', () => [button('copy-chat', 'Copy chat')])
-// Hebrew tools: its tile first on the desktop, a word in a terminal row of its own.
-const HEBREW = mod(
-  'hebrew-tools',
-  s => [...(s === 'desktop' ? [svg('Hebrew', 34)] : []), button('direction', '⇄ Left')],
-  s => (s === 'desktop' ? [spacer()] : [el('Text', {}, ['Hebrew'])]),
-)
 // Smart PreCompact's own row, with the rows beneath under it.
 const SPC: Step = {
   name: 'smart-precompact',
@@ -64,10 +58,10 @@ const rows = (node: unknown, out: string[][] = []): string[][] => {
 }
 const count = (tree: unknown, needle: string) => JSON.stringify(tree).split(needle).length - 1
 const sorted = (labels: string[]) => [...labels].sort()
-const MODS = [TLDR, COPY, HEBREW]
-const MOD_BUTTONS = ['↩ No TL;DR', 'Copy chat', '⇄ Left']
+const MODS = [TLDR, COPY]
+const MOD_BUTTONS = ['↩ No TL;DR', 'Copy chat']
 
-describe('the three mods, no Smart PreCompact', () => {
+describe('the mods, no Smart PreCompact', () => {
   test('every order, both surfaces: one shared row with every button', () => {
     for (const order of orders(MODS)) {
       for (const surface of ['desktop', 'terminal'] as const) {
