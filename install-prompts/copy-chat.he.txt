@@ -1,6 +1,0 @@
-תתקין לי את המוד Copy chat ל-Claude Code, מהריפו בגיטהאב JayGPTPro/context-mods. בבקשה:
-1. תבדוק שיש Node.js: npx --version. אם אין, תוריד במקום זה את https://github.com/JayGPTPro/context-mods/archive/refs/heads/main.zip, תפתח אותו, ותעתיק את התיקייה skills/copy-chat (כולל התיקייה הנסתרת .claude-plugin) לתיקיית הסקילים הגלובלית שלי: ~/.claude/skills/copy-chat במק ובלינוקס, %USERPROFILE%\.claude\skills\copy-chat בווינדוס. ואז תדלג לשלב 3.
-2. תריץ: npx -y skills add JayGPTPro/context-mods --skill copy-chat -g -a claude-code -y
-3. תבדוק שהקובץ ~/.claude/skills/copy-chat/.claude-plugin/plugin.json קיים. אם יש בתוך ~/.claude/skills עוד עותק או גיבוי של התיקייה הזו, תגיד לי ותשאל לפני שאתה מוחק: Claude Code יטען את המוד פעמיים.
-   תבדוק גם שיש Python 3 (python3 --version, ואם לא עובד python --version). בלעדיו הכפתור עובד, אבל מעתיק בלי השעות: תגיד לי את זה בשורה אחת.
-4. תמחק כל הורדה או zip שיצרת בדרך, ותגיד לי בדיוק את זה: "תפתח שיחה חדשה ב-Claude Code. תראה כפתור Copy chat מעל שורת הכתיבה. לחיצה אחת מעתיקה את כל השיחה, נקייה, מוכנה להדבקה. אפשר גם פשוט לבקש ממני "תעתיק את השיחה". בשיחה הזו לא ישתנה כלום, כי מודים נטענים רק בשיחה חדשה. אין כפתור? גרסת ה-Claude Code שלך עוד לא מריצה מודים: תעדכן את Claude Code ותפתח שוב שיחה חדשה. להסרה בעתיד: npx skills remove copy-chat -g"

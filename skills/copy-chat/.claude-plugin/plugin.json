@@ -1,9 +1,0 @@
-{
-  "name": "copy-chat",
-  "version": "1.0.0",
-  "description": "A Copy chat button above the prompt: the whole conversation on the clipboard as clean text with times, ready to paste into another chat",
-  "author": {
-    "name": "JayGPTPro",
-    "url": "https://jaygptpro.com"
-  }
-}

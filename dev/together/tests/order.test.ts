@@ -29,7 +29,6 @@ const mod = (name: string, items: (s: Surface) => Node[], lead: (s: Surface) => 
 })
 
 const TLDR = mod('tldr', () => [button('tldr-off', '↩ No TL;DR')])
-const COPY = mod('copy-chat', () => [button('copy-chat', 'Copy chat')])
 // Smart PreCompact's own row, with the rows beneath under it.
 const SPC: Step = {
   name: 'smart-precompact',
@@ -58,8 +57,8 @@ const rows = (node: unknown, out: string[][] = []): string[][] => {
 }
 const count = (tree: unknown, needle: string) => JSON.stringify(tree).split(needle).length - 1
 const sorted = (labels: string[]) => [...labels].sort()
-const MODS = [TLDR, COPY]
-const MOD_BUTTONS = ['↩ No TL;DR', 'Copy chat']
+const MODS = [TLDR]
+const MOD_BUTTONS = ['↩ No TL;DR']
 
 describe('the mods, no Smart PreCompact', () => {
   test('every order, both surfaces: one shared row with every button', () => {

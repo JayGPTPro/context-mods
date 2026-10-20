@@ -48,7 +48,7 @@ const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
     const shared = (
       <Box key="mods-row" flexDirection="row" alignItems="center" gap={1}>
         <Box flexGrow={1} />
-        <Button key="copy-chat" label="Copy chat" onPress={() => undefined} />
+        <Button key="other-mod" label="Other mod" onPress={() => undefined} />
       </Box>
     )
     const spc = (
@@ -62,14 +62,14 @@ const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
     if (beneath === 'engine') return <Box key="engine-band" />
     if (beneath === 'shared') return <Box key="engine-band" flexDirection="column">{shared}</Box>
     if (beneath === 'spc') return <Box key="spc-stack" flexDirection="column">{spc}</Box>
-    // Smart PreCompact's row after an inner mod (Copy chat) took a seat in it, before its hairline.
+    // Smart PreCompact's row after an inner mod (another mod) took a seat in it, before its hairline.
     if (beneath === 'spc-with-guest') {
       return (
         <Box key="spc-stack" flexDirection="column">
           <Box key="spc-band" flexDirection="row" alignItems="center" gap={1}>
             {image}
             <Box flexGrow={1} />
-            <Button key="copy-chat" label="Copy chat" onPress={() => undefined} />
+            <Button key="other-mod" label="Other mod" onPress={() => undefined} />
             {'Svg' in ui ? <ui.Svg source={'<svg xmlns="http://www.w3.org/2000/svg" width="9" height="16"></svg>'} alt="" width={9} height={16} /> : null}
             <Button key="compact" label="Smart compact" onPress={() => undefined} />
             <Button key="hide" label="Hide" onPress={() => undefined} />
@@ -337,7 +337,7 @@ describe('the shared row', () => {
     for (const surface of ['desktop', 'terminal'] as const) {
       const row = await band($, surface)
       const tree = await row.drawn()
-      expect(labels(nodeByKey(tree, 'mods-row')), surface).toEqual(['Box', 'Copy chat', '↩ No TL;DR'])
+      expect(labels(nodeByKey(tree, 'mods-row')), surface).toEqual(['Box', 'Other mod', '↩ No TL;DR'])
       expect(JSON.stringify(tree).split('"mods-row"').length - 1, surface).toBe(1)
       await row.press({ key: 'tldr-off' })
       expect((await row.find({ key: 'tldr-on' }))?.text, surface).toBe('TL;DR')
@@ -365,7 +365,7 @@ describe('the shared row', () => {
     await start($)
     const row = await band($)
     const tree = await row.drawn()
-    expect(labels(nodeByKey(tree, 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Copy chat', '↩ No TL;DR', '', 'Smart compact', 'Hide'])
+    expect(labels(nodeByKey(tree, 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Other mod', '↩ No TL;DR', '', 'Smart compact', 'Hide'])
     expect(nodeByKey(tree, 'mods-row')).toBeNull()
     await row.unmount()
   })
@@ -377,12 +377,12 @@ describe('the shared row', () => {
     await start($)
     const narrow = await band($, 'desktop', 50)
     expect(labels(nodeByKey(await narrow.drawn(), 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Smart compact', 'Hide'])
-    expect(labels(nodeByKey(await narrow.drawn(), 'mods-row'))).toEqual(['Box', 'Copy chat', '↩ No TL;DR'])
+    expect(labels(nodeByKey(await narrow.drawn(), 'mods-row'))).toEqual(['Box', 'Other mod', '↩ No TL;DR'])
     await narrow.unmount()
     const terminal = await band($, 'terminal')
     // A terminal draws no image: the stand-in's Svg reads as a Box there.
     expect(labels(nodeByKey(await terminal.drawn(), 'spc-band')).slice(2)).toEqual(['Smart compact', 'Hide'])
-    expect(labels(nodeByKey(await terminal.drawn(), 'mods-row'))).toEqual(['Box', 'Copy chat', '↩ No TL;DR'])
+    expect(labels(nodeByKey(await terminal.drawn(), 'mods-row'))).toEqual(['Box', 'Other mod', '↩ No TL;DR'])
     await terminal.unmount()
   })
 
@@ -392,12 +392,12 @@ describe('the shared row', () => {
     world(on, [prompt('hi'), answer('short.')], 'spc-with-guest')
     await start($)
     const roomy = await band($, 'desktop', 120)
-    expect(labels(nodeByKey(await roomy.drawn(), 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Copy chat', '↩ No TL;DR', '', 'Smart compact', 'Hide'])
+    expect(labels(nodeByKey(await roomy.drawn(), 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Other mod', '↩ No TL;DR', '', 'Smart compact', 'Hide'])
     await roomy.unmount()
     const tight = await band($, 'desktop', 70)
     const tree = await tight.drawn()
     expect(labels(nodeByKey(tree, 'spc-band'))).toEqual(['Smart PreCompact', 'Box', 'Smart compact', 'Hide'])
-    expect(labels(nodeByKey(tree, 'mods-row'))).toEqual(['Box', 'Copy chat', '↩ No TL;DR'])
+    expect(labels(nodeByKey(tree, 'mods-row'))).toEqual(['Box', 'Other mod', '↩ No TL;DR'])
     await tight.unmount()
   })
 })

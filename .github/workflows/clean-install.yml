@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        mods: ["tldr-highlight", "copy-chat", "all"]
+        mods: ["tldr-highlight", "all"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -30,7 +30,7 @@ jobs:
       - name: Install the way the prompt does
         run: |
           if [ "${{ matrix.mods }}" = "all" ]; then
-            npx -y skills add JayGPTPro/context-mods --skill tldr-highlight copy-chat -g -a claude-code -y
+            npx -y skills add JayGPTPro/context-mods --skill tldr-highlight -g -a claude-code -y
             npx -y skills add JayGPTPro/smart-precompact -g -a claude-code -y
           else
             npx -y skills add JayGPTPro/context-mods --skill "${{ matrix.mods }}" -g -a claude-code -y
@@ -38,7 +38,7 @@ jobs:
 
       - name: Check what landed
         run: |
-          if [ "${{ matrix.mods }}" = "all" ]; then want="tldr-highlight copy-chat smart-precompact"; else want="${{ matrix.mods }}"; fi
+          if [ "${{ matrix.mods }}" = "all" ]; then want="tldr-highlight smart-precompact"; else want="${{ matrix.mods }}"; fi
           base="$HOME/.claude/skills"
           ls -la "$base"
           for m in $want; do
@@ -50,10 +50,6 @@ jobs:
           # nothing but the asked-for mods: a stray copy would load a mod twice
           extra=$(ls "$base" | grep -v -x -E "$(echo $want | tr ' ' '|')" || true)
           if [ -n "$extra" ]; then echo "UNEXPECTED in skills: $extra"; exit 1; fi
-
-      - name: Copy chat's transcript reader
-        if: matrix.mods == 'copy-chat' || matrix.mods == 'all'
-        run: python skills/copy-chat/tests/test_thread.py
 
       - name: Smart PreCompact's hook tests
         if: matrix.mods == 'all'

@@ -1,4 +1,4 @@
-// One row above the prompt for every mod in this collection (tldr, copy-chat).
+// One row above the prompt that mods can share (TL;DR, and Smart PreCompact's own row beneath it).
 // Shared file: the three copies are kept the same (dev/check_shared.py checks).
 //
 // Hooks on the row above the prompt nest: each one gets the drawing of the hooks beneath it from
