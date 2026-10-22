@@ -149,11 +149,12 @@ describe('highlight', () => {
     // Two highlighted boxes, each holding one picked paragraph.
     expect(tree.split(YELLOW).length - 1).toBe(2)
     expect(tree).not.toMatch(ENGINE)
-    // Each paragraph is still drawn by the hooks beneath (another mod's alignment, the engine), and
-    // only the first carries the reply's bullet.
-    expect(tree).toContain('DRAWN:מחכה לך: צריך אישור')
+    // The first group goes to the hooks beneath (another mod's alignment, the engine) with the reply's
+    // bullet; the others are drawn as markdown, and the picked paragraph is in one of them.
     expect(tree).toContain('DRAWN•:## מה עשיתי')
-    expect(tree.split('DRAWN•').length - 1).toBe(1)
+    expect(tree.split('DRAWN').length - 1).toBe(1)
+    expect(tree).toContain('"type":"Markdown"')
+    expect(tree).toContain('מחכה לך: צריך אישור')
   })
 
   test('the highlight shows when the drawing beneath is the app\'s own (a reference with no words in it)', async ($, on) => {
@@ -166,6 +167,20 @@ describe('highlight', () => {
     w.asEngine = true
     const tree = await drawn($, 'desktop', LONG)
     expect(tree.split(YELLOW).length - 1).toBe(2)
+  })
+
+  test('the whole reply stays on screen: the app draws one reference per reply, so the rest is drawn as markdown', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    w.asEngine = true
+    const tree = await drawn($, 'desktop', LONG)
+    // The app shows only the first of several references to its own drawing: the rest of the reply vanished.
+    expect(tree.split('"type":"engine"').length - 1).toBeLessThanOrEqual(1)
+    for (const words of ['מחכה לך: צריך אישור', 'עוד פסקה של פרטים טכניים', 'הסבר רקע ארוך']) expect(tree).toContain(words)
   })
 
   test('when a mod beneath draws the reply in other words (a translation), that drawing wins', async ($, on) => {

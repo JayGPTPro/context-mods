@@ -234,10 +234,11 @@ export const register: Register = on => {
     const firstMarked = parts[flags.indexOf(true)] ?? ''
     if (!holds(whole, firstMarked)) return whole
 
-    const { Box } = $.ui.resolve(e)
-    // Unmarked paragraphs in a row stay one group, so a list keeps its numbering. Each group is drawn
-    // by the hooks beneath, as the whole reply would have been (alignment, the engine's markdown);
-    // only the first keeps the bullet that opens a reply.
+    const { Box, Markdown } = $.ui.resolve(e)
+    // Unmarked paragraphs in a row stay one group, so a list keeps its numbering. The app draws only
+    // the first reference to its own drawing in a tree (the rest of a reply vanished, 22.10.2026), so
+    // only the first group goes to the hooks beneath, keeping the bullet that opens a reply; every
+    // other group is drawn as markdown, the way the app draws a reply's text.
     const groups: { text: string; isMarked: boolean }[] = []
     parts.forEach((part, i) => {
       const last = groups[groups.length - 1]
@@ -247,7 +248,7 @@ export const register: Register = on => {
     })
     const drawn: RenderChildren[] = []
     for (const [i, group] of groups.entries()) {
-      const piece = await next({ ...e, props: { ...e.props, text: group.text, isFirstOfReply: e.props.isFirstOfReply && i === 0 } })
+      const piece = i === 0 ? await next({ ...e, props: { ...e.props, text: group.text } }) : <Markdown key={`t${i}`} text={group.text} />
       drawn.push(
         group.isMarked ? (
           <Box key={`m${i}`} backgroundColor={HIGHLIGHT} paddingX={1}>
