@@ -12,6 +12,8 @@ declare module 'claude-code' {
       brief: Brief | null
       /** The id of the last reply read, so one reply is never sent to the model twice. */
       lastRead: string | null
+      /** A reply arrived while one was being read: read again when done. */
+      again: boolean
       /** One flag per paragraph, by its id (keyOf): true when it is highlighted. */
       marked: StateFamily<boolean>
     }

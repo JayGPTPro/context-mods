@@ -1,5 +1,5 @@
 // One row above the prompt that mods can share (TL;DR, and Smart PreCompact's own row beneath it).
-// Shared file: the three copies are kept the same (dev/check_shared.py checks).
+// Shared file: every mod that draws this row carries the same copy.
 //
 // Hooks on the row above the prompt nest: each one gets the drawing of the hooks beneath it from
 // next(e), as plain data ({ type, props, children }), and returns the whole drawing. Which mod is

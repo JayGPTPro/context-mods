@@ -13,7 +13,7 @@
 | **TL;DR** (`tldr-highlight`) | אחרי תשובה ארוכה, הפסקאות ששווה לקרוא נצבעות בצהוב והודעה קטנה אומרת את כל התשובה במשפט אחד, בשפה שלך. כפתור `TL;DR` מדליק ומכבה. | קריאה קצרה אחת ל-Haiku לכל תשובה ארוכה, מהמנוי שלך |
 | **Smart PreCompact** | מד קונטקסט מעל שורת הכתיבה וכפתור `Smart compact` שאומר לקומפאקט מה לשמור. נמצא בריפו משלו: [JayGPTPro/smart-precompact](https://github.com/JayGPTPro/smart-precompact). | קריאה אחת כשעושים קומפאקט |
 
-כשמתקינים את שניהם, הם חולקים שורה אחת מעל שורת הכתיבה באפליקציה.
+כשמתקינים את שניהם, הם יכולים לחלוק שורה אחת מעל שורת הכתיבה באפליקציה.
 
 ## התקנה
 
@@ -89,6 +89,8 @@ npx skills remove tldr-highlight -g
 ## למפתחים
 
 המוד הוא תיקיית סקיל בתוך `skills/`: ‏`SKILL.md`, ‏`.claude-plugin/plugin.json`, ‏`hooks/` (`register.tsx`, ו-`panel.ts`, השורה המשותפת) ו-`tests/`. ‏`dev/test-all.sh` מריץ את כל הבדיקות: `claude plugin test` ו-`claude plugin validate` של המוד, והשורה המשותפת בכל סדר טעינה אפשרי של המוד ו-Smart PreCompact.
+
+רץ על Mac ועל Linux.
 
 נבנה על ידי [ג'יי](https://jaygptpro.com). פרויקט עצמאי, לא מוצר של Anthropic.
 

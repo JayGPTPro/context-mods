@@ -26,13 +26,15 @@ const prompt = (text: string): Row => ({ role: 'user', text, toolUses: [] })
 const answer = (text: string): Row => ({ role: 'assistant', text, toolUses: [] })
 
 type Beneath = 'engine' | 'shared' | 'spc' | 'spc-over-shared' | 'spc-with-guest'
-type World = { rows: Row[]; asked: { prompt: string; model: string }[]; reply: string; toasts: string[]; translates: boolean; asEngine: boolean }
+type World = { rows: Row[]; asked: { prompt: string; model: string }[]; reply: string; toasts: string[]; translates: boolean; asEngine: boolean; orients: boolean; gate: (() => Promise<void>) | null }
 
 const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
-  const w: World = { rows, asked: [], toasts: [], translates: false, asEngine: false, reply: '{"tldr": "מחכה לך: אישור לפני דחיפה לאתר — החי", "marks": [2, 5]}' }
+  const w: World = { rows, asked: [], toasts: [], translates: false, asEngine: false, orients: false, gate: null, reply: '{"tldr": "מחכה לך: אישור לפני דחיפה לאתר — החי", "marks": [2, 5]}' }
   on('session.messages', () => ({ value: w.rows as never }))
-  on('model.complete', (_, e) => {
+  on('model.complete', async (_, e) => {
     w.asked.push({ prompt: e.prompt, model: e.model })
+    // A test that needs the model to take its time holds it here.
+    if (w.gate) await w.gate()
     return { value: { isAnswered: true, text: w.reply, usage: { input_tokens: 1, output_tokens: 1 } } as never }
   })
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -90,10 +92,17 @@ const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
     // What reaches the hooks beneath (another mod, then the engine) is drawn marked, so a test sees
     // each paragraph went through them. A reply an inner mod would translate comes back other words.
     // The kit keeps no key on a bare Text: the engine's drawing is told by its type.
+    // A mod beneath that draws the reply in other words (a translation) over the app's own drawing says
+    // so with a node keyed `translated`; and one asked for a piece as markdown draws it that way itself,
+    // with its own change to the text (a direction mark at the start, here).
+    const { Box, Markdown } = $.ui.resolve(e)
+    const asked = e.props as { asMarkdown?: unknown }
+    if (w.orients && asked.asMarkdown === true) return <Markdown text={`${RLM}${e.props.text}`} />
+    if (w.translates && w.asEngine && e.props.text === LONG) return <Box key="translated">{{ type: 'engine', ref: 1 } as never}</Box>
     if (w.translates && e.props.text === LONG) return <Text>TRANSLATED</Text>
     // What the real app answers: a reference to its own drawing, with none of the reply's words in it.
     if (w.asEngine) return { type: 'engine', ref: 1 } as never
-    return <Text>{`DRAWN${e.props.isFirstOfReply ? '•' : ''}:${e.props.text}`}</Text>
+    return <Text>{`DRAWN${e.props.isFirstOfReply ? '•' : ''}:${w.orients ? RLM : ''}${e.props.text}`}</Text>
   })
   return w
 }
@@ -149,12 +158,10 @@ describe('highlight', () => {
     // Two highlighted boxes, each holding one picked paragraph.
     expect(tree.split(YELLOW).length - 1).toBe(2)
     expect(tree).not.toMatch(ENGINE)
-    // The first group goes to the hooks beneath (another mod's alignment, the engine) with the reply's
-    // bullet; the others are drawn as markdown, and the picked paragraph is in one of them.
+    // Every group goes to the hooks beneath; only the first carries the reply's bullet.
     expect(tree).toContain('DRAWN•:## מה עשיתי')
-    expect(tree.split('DRAWN').length - 1).toBe(1)
-    expect(tree).toContain('"type":"Markdown"')
-    expect(tree).toContain('מחכה לך: צריך אישור')
+    expect(tree.split('DRAWN•').length - 1).toBe(1)
+    expect(tree).toContain('DRAWN:מחכה לך: צריך אישור')
   })
 
   test('the highlight shows when the drawing beneath is the app\'s own (a reference with no words in it)', async ($, on) => {
@@ -287,6 +294,157 @@ describe('highlight', () => {
     const tree = await drawn($, 'desktop', LONG)
     // The heading (1) and the code block (3) are never picked; the long background (4) breaks the share cap.
     expect(tree.split(YELLOW).length - 1).toBe(2)
+  })
+})
+
+describe('with a mod beneath', () => {
+  test('a translation drawn beneath over the app\'s own drawing wins, and nothing is highlighted', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    w.translates = true
+    w.asEngine = true
+    const tree = await drawn($, 'desktop', LONG)
+    expect(tree).toContain('"translated"')
+    expect(tree).not.toContain(YELLOW)
+    expect(tree.split('"type":"engine"').length - 1).toBe(1)
+  })
+
+  test('every piece past the first goes through the mod beneath, so its direction mark is kept on them', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    w.orients = true
+    const tree = await drawn($, 'desktop', LONG)
+    expect(tree.split(YELLOW).length - 1).toBe(2)
+    // The first piece: the app's own drawing with the reply's bullet. The rest: markdown the mod beneath
+    // drew, each piece opening with its mark.
+    expect(tree).toContain(`DRAWN•:${RLM}## מה עשיתי`)
+    expect(tree).toContain(`"text":"${RLM}מחכה לך: צריך אישור`)
+    expect(tree).toContain(`"text":"${RLM}עוד פסקה`)
+    expect(tree).not.toContain('"text":"מחכה לך')
+  })
+
+  test('with no mod beneath, the pieces past the first are drawn as markdown and one reference stays', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    w.asEngine = true
+    const tree = await drawn($, 'desktop', LONG)
+    expect(tree.split('"type":"engine"').length - 1).toBe(1)
+    expect(tree).toContain('"type":"Markdown"')
+    expect(tree).toContain('מחכה לך: צריך אישור')
+  })
+})
+
+describe('which paragraphs are marked', () => {
+  test('a paragraph marked once is not yellow in a later reply the model never picked it in', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    const waiting = 'מחכה לך: צריך אישור שלך לפני שאני דוחף את השינוי לאתר החי, כי זה משפיע על כל הלקוחות.'
+    expect(await drawn($, 'desktop', waiting)).toContain(YELLOW)
+    // The next reply is short and repeats that line: the model never reads it, so it is plain.
+    const short = `סיימתי.\n\n${waiting}`
+    w.rows = [...w.rows, prompt('ועכשיו?'), answer(short)]
+    await finish($)
+    await clock.settle()
+    expect(w.asked.length).toBe(1)
+    expect(await drawn($, 'desktop', short)).not.toContain(YELLOW)
+    // And a long reply the model reads again marks only what it picks this time.
+    w.rows = [...w.rows, prompt('ועוד'), answer(LONG)]
+    w.reply = '{"tldr": "הכל טוב", "marks": [2]}'
+    await finish($)
+    await clock.settle()
+    expect(w.asked.length).toBe(2)
+    expect((await drawn($, 'desktop', LONG)).split(YELLOW).length - 1).toBe(1)
+  })
+
+  test('a slash command between two replies keeps them apart', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [
+      prompt('fix the form'),
+      answer(LONG),
+      prompt('<command-name>/model</command-name>\n<command-message>model</command-message>'),
+      prompt('<local-command-stdout>Set model to opus</local-command-stdout>'),
+      answer('Done.'),
+    ])
+    await start($)
+    await clock.settle()
+    // The reply after the command is short: nothing is read, nothing is sent.
+    expect(w.asked.length).toBe(0)
+  })
+
+  test('the model\'s JSON is read even when words with braces follow it', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    w.reply = '{"tldr": "מחכה לך: אישור", "marks": [2]}\nNote: {done}'
+    await start($)
+    await finish($)
+    await clock.settle()
+    expect(w.toasts).toContain('מחכה לך: אישור')
+  })
+
+  test('two triggers close together read the reply once', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await Promise.all([finish($), finish($)])
+    await clock.settle()
+    expect(w.asked.length).toBe(1)
+  })
+
+  test('turned off while the model reads: the marks wait for the button, no sentence shows, no second call', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    let release: (() => void) | null = null
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    w.gate = () =>
+      new Promise<void>(resolve => {
+        release = resolve
+      })
+    await start($)
+    const reading = finish($)
+    const row = await band($)
+    await row.press({ key: 'tldr-off' })
+    w.gate = null
+    release?.()
+    await reading
+    await clock.settle()
+    expect(w.toasts).toEqual([])
+    expect(await drawn($, 'desktop', LONG)).toMatch(ENGINE)
+    await row.press({ key: 'tldr-on' })
+    await clock.settle()
+    expect(w.asked.length).toBe(1)
+    expect(await drawn($, 'desktop', LONG)).toContain(YELLOW)
+    await row.unmount()
+  })
+})
+
+describe('paragraphs', () => {
+  test('a tilde line inside a backtick block does not end it, and an indented paragraph stays with its list item', async ($, on) => {
+    mock.clock(on)
+    mock.store(on)
+    world(on, [prompt('hi'), answer('short.')])
+    await start($)
+    const { paragraphs } = await import('../hooks/register')
+    expect(paragraphs('```\n~~~\n```\n\nאחרי')).toEqual(['```\n~~~\n```', 'אחרי'])
+    expect(paragraphs('1. step\n\n    - detail\n\n2. step')).toEqual(['1. step\n\n    - detail', '2. step'])
   })
 })
 

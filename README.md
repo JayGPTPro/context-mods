@@ -14,7 +14,7 @@ Code loads it by itself in every new conversation.
 | **TL;DR** (`tldr-highlight`) | After a long reply, the paragraphs worth reading turn yellow and a notification says the reply in one sentence, in your language. A `TL;DR` button turns it on and off. | One short Haiku call per long reply, from your Claude plan |
 | **Smart PreCompact** | A context meter above the prompt and a `Smart compact` button that tells the compact what to keep. Lives in its own repo: [JayGPTPro/smart-precompact](https://github.com/JayGPTPro/smart-precompact). | One call when you compact |
 
-Installed together, they share one row above the prompt in the desktop app.
+Installed together, they can share one row above the prompt in the desktop app.
 
 ## Install
 

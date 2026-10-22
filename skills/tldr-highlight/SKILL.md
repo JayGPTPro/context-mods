@@ -31,8 +31,8 @@ Answer in the language of the user's messages.
 ## The button
 
 Above the prompt: `↩ No TL;DR` turns it off, `TL;DR` turns it back on (and reads the reply on
-screen right away). The choice is kept for the next conversations. When other mods from this
-collection, or Smart PreCompact, are installed, the button sits in the same row as theirs.
+screen right away). The choice is kept for the next conversations. With Smart PreCompact installed,
+the button can sit in its row in the desktop app, when there is room.
 
 ## What it costs
 
