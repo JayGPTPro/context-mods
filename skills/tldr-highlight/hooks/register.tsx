@@ -285,7 +285,7 @@ export const register: Register = on => {
     if ('tree' in placed) return placed.tree
     return (
       <Box flexDirection="column">
-        <Box key={ROW_KEY} flexDirection="row" alignItems="center" gap={1}>
+        <Box key={ROW_KEY} flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
           <Box flexGrow={1} />
           {placed.carry}
           {button}
