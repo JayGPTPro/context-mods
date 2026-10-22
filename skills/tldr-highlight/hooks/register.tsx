@@ -181,11 +181,26 @@ const toggle = async ($: EngineInterface) => {
   if (on) await mark($).catch(() => undefined)
 }
 
-/** A drawing that still holds a paragraph's words: its first line, direction marks aside. */
+/** The words a drawing carries: its strings and its text props. The app's own drawing of a reply is a
+ * reference (`{ type: 'engine', ref }`) and carries none. */
+const wordsOf = (tree: unknown, out: string[] = []): string[] => {
+  if (typeof tree === 'string') out.push(tree)
+  else if (Array.isArray(tree)) tree.forEach(t => wordsOf(t, out))
+  else if (tree !== null && typeof tree === 'object') {
+    const node = tree as { props?: { text?: unknown }; children?: unknown }
+    if (typeof node.props?.text === 'string') out.push(node.props.text)
+    wordsOf(node.children, out)
+  }
+  return out
+}
+
+/** A drawing that still holds a paragraph's words: its first line, direction marks aside. A drawing with
+ * no words at all is the app's own, drawn from the text this hook passed down, so it holds them. */
 const holds = (tree: unknown, part: string) => {
   const line = (part.replace(MARKS_ALL, '').split('\n').find(l => l.trim() !== '') ?? '').trim().slice(0, 40)
   if (line === '') return true
-  return JSON.stringify(tree).replace(MARKS_ALL, '').includes(JSON.stringify(line).slice(1, -1))
+  const words = wordsOf(tree).join('\n').replace(MARKS_ALL, '')
+  return words === '' || words.includes(line)
 }
 
 export const register: Register = on => {

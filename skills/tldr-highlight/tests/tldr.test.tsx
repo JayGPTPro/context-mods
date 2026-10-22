@@ -26,10 +26,10 @@ const prompt = (text: string): Row => ({ role: 'user', text, toolUses: [] })
 const answer = (text: string): Row => ({ role: 'assistant', text, toolUses: [] })
 
 type Beneath = 'engine' | 'shared' | 'spc' | 'spc-over-shared' | 'spc-with-guest'
-type World = { rows: Row[]; asked: { prompt: string; model: string }[]; reply: string; toasts: string[]; translates: boolean }
+type World = { rows: Row[]; asked: { prompt: string; model: string }[]; reply: string; toasts: string[]; translates: boolean; asEngine: boolean }
 
 const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
-  const w: World = { rows, asked: [], toasts: [], translates: false, reply: '{"tldr": "מחכה לך: אישור לפני דחיפה לאתר — החי", "marks": [2, 5]}' }
+  const w: World = { rows, asked: [], toasts: [], translates: false, asEngine: false, reply: '{"tldr": "מחכה לך: אישור לפני דחיפה לאתר — החי", "marks": [2, 5]}' }
   on('session.messages', () => ({ value: w.rows as never }))
   on('model.complete', (_, e) => {
     w.asked.push({ prompt: e.prompt, model: e.model })
@@ -91,6 +91,8 @@ const world = (on: On, rows: Row[], beneath: Beneath = 'engine'): World => {
     // each paragraph went through them. A reply an inner mod would translate comes back other words.
     // The kit keeps no key on a bare Text: the engine's drawing is told by its type.
     if (w.translates && e.props.text === LONG) return <Text>TRANSLATED</Text>
+    // What the real app answers: a reference to its own drawing, with none of the reply's words in it.
+    if (w.asEngine) return { type: 'engine', ref: 1 } as never
     return <Text>{`DRAWN${e.props.isFirstOfReply ? '•' : ''}:${e.props.text}`}</Text>
   })
   return w
@@ -152,6 +154,18 @@ describe('highlight', () => {
     expect(tree).toContain('DRAWN:מחכה לך: צריך אישור')
     expect(tree).toContain('DRAWN•:## מה עשיתי')
     expect(tree.split('DRAWN•').length - 1).toBe(1)
+  })
+
+  test('the highlight shows when the drawing beneath is the app\'s own (a reference with no words in it)', async ($, on) => {
+    const clock = mock.clock(on)
+    mock.store(on)
+    const w = world(on, [prompt('תתקן את הטופס'), answer(LONG)])
+    await start($)
+    await finish($)
+    await clock.settle()
+    w.asEngine = true
+    const tree = await drawn($, 'desktop', LONG)
+    expect(tree.split(YELLOW).length - 1).toBe(2)
   })
 
   test('when a mod beneath draws the reply in other words (a translation), that drawing wins', async ($, on) => {
